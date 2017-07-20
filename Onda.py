@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-#from mascarasXY import *
+from matplotlib import animation
 
 n_puntos=300
 c=1.
@@ -15,45 +15,69 @@ u_inicial=np.zeros((n_puntos+2,n_puntos+2))
 u_inicial[100,151]=-0.5
 u_pasado=np.zeros((n_puntos+2,n_puntos+2))
 u_futuro=np.zeros((n_puntos+2,n_puntos+2))
-resultado=[]
 
 num=float((c**2)*dt/2)
 num_2=float((c*dt)**2)
 
-resultado.append(u_inicial)
 
-def propagacion(n_t):
+def propagacion(t_n):
 
+    resultado=[]
+    resultado.append(u_inicial)
     
-    for j in range (1,300):
-        for k in range (1,300):
+    #mascara
+    mascara=np.ones((n_puntos+2, n_puntos+2))
+    for i in range (0,n_puntos):
+        for j in range (0,n_puntos+2):
+            if (i==200):
+                mascara[i,j]=0
+                for j in range (140,160):   
+                    mascara[i,j]=1
+    
+    for j in range (1,n_puntos):
+        for k in range (1,n_puntos):
             u_futuro[j,k]=((num/dx)*(u_inicial[j+1,k]-u_inicial[j-1,k]))+((num/dy)*(u_inicial[j,k+1]-u_inicial[j,k-1]))
 
     u_pasado=u_inicial.copy()
-    u_presente=u_futuro.copy()
+    u_presente=u_futuro.copy()*mascara
     resultado.append(u_presente)
     
 
-    for i in range (1,n_t):
-        for j in range (1,300):
-            for k in range (1,300):
+    for i in range (1,t_n):
+        for j in range (1,n_puntos):
+            for k in range (1,n_puntos):
                 u_futuro[j,k]=((num_2/dx**2)*(u_presente[j+1,k]-2*u_presente[j,k]+u_presente[j-1,k]))+((num_2/dy**2)*(u_presente[j,k+1]-2*u_presente[j,k]+u_presente[j,k-1]))+2*u_presente[j,k]-u_pasado[j,k]
         u_pasado=u_presente.copy()
-        u_presente=u_futuro.copy()
+        u_presente=u_futuro.copy()*mascara
         resultado.append(u_presente)
 
 
     return(u_presente,resultado)
 
-#print(propagacion(2)[1][100,151])
-#print(propagacion(30)[1][100,151])
 
 
-plt.imshow(propagacion(30)[0])
-plt.savefig("Propagacion_hasta_t=30.pdf")
-plt.imshow(propagacion(60)[0])
-plt.savefig("Propagacion_hasta_t=60.pdf")
+t_60=int(60/dt)
+t_30=int(30/dt)
+
+resultado_t60= propagacion(t_60)[1]
+#plt.imshow(propagacion(t_30)[0])
+#plt.savefig("Propagacion_hasta_t=30.pdf")
+#plt.imshow(propagacion(t_60)[0])
+#plt.savefig("Propagacion_hasta_t=60.pdf")
+
+lista=[]
+for i in range (0,int(len(resultado_t60)/4)):
+    lista.append(resultado_t60[i*4])
 
 
+fig=plt.figure()
+aa=plt.imshow(abs(lista[0]),cmap='flag', extent= (30+dx, 30-dx, 30+dy, 30-dy))
 
-        
+def func(i):
+    aa.set_array(abs(lista[i]))
+    return aa,
+
+animacion = animation.FuncAnimation(fig, func, np.arange(1, len(lista)), interval=20, blit=False)
+animacion.save('Onda.mp4')
+
+
