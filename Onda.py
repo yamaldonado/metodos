@@ -11,6 +11,8 @@ dy=y/(float(n_puntos-1))
 r=0.5
 dt=(r*dx)/c
 
+#inicializacion de los arreglos temporales con un tamano de 302
+
 u_inicial=np.zeros((n_puntos+2,n_puntos+2))
 u_inicial[100,151]=-0.5
 u_pasado=np.zeros((n_puntos+2,n_puntos+2))
@@ -33,7 +35,8 @@ def propagacion(t_n):
                 mascara[i,j]=0
                 for j in range (140,160):   
                     mascara[i,j]=1
-    
+                    
+    #se hace un recorrido de 1 a 300 para dejar los bordes del cuadrado en cero y que no hayan errores con las derivadas
     for j in range (1,n_puntos):
         for k in range (1,n_puntos):
             u_futuro[j,k]=((num/dx)*(u_inicial[j+1,k]-u_inicial[j-1,k]))+((num/dy)*(u_inicial[j,k+1]-u_inicial[j,k-1]))
@@ -59,17 +62,22 @@ def propagacion(t_n):
 t_60=int(60/dt)
 t_30=int(30/dt)
 
-resultado_t60= propagacion(t_60)[1]
-#plt.imshow(propagacion(t_30)[0])
-#plt.savefig("Propagacion_hasta_t=30.pdf")
-#plt.imshow(propagacion(t_60)[0])
-#plt.savefig("Propagacion_hasta_t=60.pdf")
+resultado_t60= propagacion(t_60)[1]  #lista de matrices
 
+#graficas para t=30 y t=60
+plt.imshow(propagacion(t_30)[0])
+plt.savefig("Propagacion_hasta_t=30.pdf")
+plt.imshow(propagacion(t_60)[0])
+plt.savefig("Propagacion_hasta_t=60.pdf")
+
+
+#se recortan la mitad de los datos 
 lista=[]
-for i in range (0,int(len(resultado_t60)/4)):
-    lista.append(resultado_t60[i*4])
+for i in range (0,int(len(resultado_t60)/2)):
+    lista.append(resultado_t60[i*2])
 
 
+#Metodo de animacion   
 fig=plt.figure()
 aa=plt.imshow(abs(lista[0]),cmap='flag', extent= (30+dx, 30-dx, 30+dy, 30-dy))
 

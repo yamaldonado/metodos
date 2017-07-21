@@ -4,7 +4,7 @@
 #include <math.h>
 #define PI 3.14159
 #define n (250 * 365)  //años total= 250 ; dt= 1/365.0//
-#define G 4*pow(PI,2)
+#define G 39.476568
 #define dt 0.0027   //dt= 1 dia
 
 void aceleracion(int i, int a, float *masas, double *axx, double *ayy, double *azz, double *x, double *y, double *z){
@@ -120,7 +120,7 @@ int main (void){
       vy[ind_2] = v_yhalf[i] + 0.5 * ay * dt;
       vz[ind_2] = v_zhalf[i] + 0.5 * az * dt;
 
-      //printf("%e\n", x[ind_1]);
+      //printf("%e %e %e\n", x[ind_1], y[ind_1], z[ind_1]);   
       
           
       }    
